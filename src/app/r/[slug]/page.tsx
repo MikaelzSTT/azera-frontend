@@ -15,6 +15,8 @@ export default function ReviewPage() {
   const params = useParams();
   const slug = String(params.slug);
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
   const [business, setBusiness] = useState<Business | null>(null);
   const [showPrivateFeedback, setShowPrivateFeedback] = useState(false);
   const [feedbackRating, setFeedbackRating] = useState<number>(3);
@@ -25,7 +27,7 @@ export default function ReviewPage() {
   useEffect(() => {
     const loadBusiness = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/businesses/${slug}`);
+        const response = await fetch(`${apiUrl}/businesses/${slug}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -40,7 +42,7 @@ export default function ReviewPage() {
 
     const registerScan = async () => {
       try {
-        await fetch("http://localhost:5000/scans", {
+        await fetch(`${apiUrl}/scans`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -54,17 +56,17 @@ export default function ReviewPage() {
       }
     };
 
-    if (slug) {
+    if (slug && apiUrl) {
       loadBusiness();
       registerScan();
     }
-  }, [slug]);
+  }, [slug, apiUrl]);
 
   const handleGoogleReview = async () => {
     if (!business?.googleReviewUrl) return;
 
     try {
-      await fetch("http://localhost:5000/google-reviews", {
+      await fetch(`${apiUrl}/google-reviews`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -87,7 +89,7 @@ export default function ReviewPage() {
 
   const sendFeedback = async () => {
     try {
-      await fetch("http://localhost:5000/feedback", {
+      await fetch(`${apiUrl}/feedback`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -189,7 +191,9 @@ export default function ReviewPage() {
                   type="button"
                   onClick={() => setFeedbackRating(star)}
                   className={
-                    star <= feedbackRating ? "text-yellow-400" : "text-gray-600"
+                    star <= feedbackRating
+                      ? "text-yellow-400"
+                      : "text-gray-600"
                   }
                 >
                   ★
